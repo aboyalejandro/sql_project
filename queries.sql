@@ -389,7 +389,7 @@ order by country_name desc;
 -- adding location tables
 
 CREATE VIEW locations_tables AS 
-select *
+select l.country_name as country_name, l.country_abbrev as country_abbrev -- pending metrics to add
 from locations as l
 inner join gdp_table as gdp
 	on l.country_abbrev = gdp.geo
