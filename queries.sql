@@ -385,3 +385,21 @@ order by country_name desc;
 -- Norway: le-wagon is the only one here
 -- Canada & Belgium: la-capsule & wild-code-schools mainly works on French speaking countries, so competition would be harder if the bootcamp are not taught in French.
 -- Web development courses would the best first option because of the highest overall rates
+
+-- adding location tables
+
+CREATE VIEW locations_tables AS 
+select *
+from locations as l
+inner join gdp_table as gdp
+	on l.country_abbrev = gdp.geo
+inner join mean_annual_earning as mae
+	on l.country_abbrev = mae.geo
+inner join part_empl_edu as pee
+	on l.country_abbrev = pee.geo
+inner join itc_services as itc
+	on l.country_name = itc.GEO
+inner join jvs_table as jvs
+	on l.country_name = jvs.GEO
+
+
