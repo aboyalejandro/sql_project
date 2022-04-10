@@ -22,9 +22,6 @@ SELECT school
 FROM comments
 GROUP BY school;
 
-
- 
-
 -- Performance per school
   -- We can see  by the rating of the alumni the performance for each school order by the schools with more alumni
 SELECT school, sum(isAlumni) AS alumni_votes,
@@ -253,4 +250,123 @@ JOIN locations as l
 ON c.school = l.school
 GROUP BY l.country_name
 HAVING AVG(c.overallScore) > (SELECT AVG(overallscore) FROM comments) AND country_name IS NOT NULL
-ORDER BY country_name
+ORDER BY country_name;
+
+-- Understand job_vacancy rates on countries where Ironhack is not present
+CREATE VIEW job_vacancy_IT_stats AS
+select TIME as year, GEO as country, Value as IT_vacancy_rate
+from jvs_table
+where TIME = '2019' or TIME = '2020' or TIME = '2021' 
+					and GEO != 'United States' 
+					and GEO != 'Germany' 
+					and GEO !='France' 
+                    and GEO != 'Spain' 
+                    and GEO != 'Portugal' 
+                    and GEO != 'Netherlands' 
+                    and GEO != 'United Kingdom' 
+                    and GEO != 'Brazil' 
+                    and GEO != 'Mexico'
+order by TIME desc, Value desc;
+
+select *
+from job_vacancy_IT_stats
+where year = '2019'
+limit 5;
+
+select *
+from job_vacancy_IT_stats
+where year = '2020'
+limit 5;
+
+select *
+from job_vacancy_IT_stats
+where year = '2021'
+limit 5;
+
+-- Understand government expenditure on education on countries where Ironhack is not present
+
+ALTER TABLE government_expenditure
+RENAME COLUMN `Expenditure ($M)` to Expenditure_M; 
+
+ALTER TABLE government_expenditure
+RENAME COLUMN `Education Expenditure (%Bud.)` to Expenditure_budget; 
+
+ALTER TABLE government_expenditure
+RENAME COLUMN `Expenditure (%GDP)` to Expenditure_gdp; 
+
+ALTER TABLE government_expenditure
+RENAME COLUMN `Ch.` to YOY_growth;
+
+ALTER TABLE government_expenditure
+DROP COLUMN `Gov. Health Exp. (%Bud.)`; 
+
+ALTER TABLE government_expenditure
+DROP COLUMN `Defence Expenditure (%Bud.)`;  
+
+CREATE VIEW country_expenditure_excluded AS
+select distinct ge.Countries, ge.Date, 
+				ge.Expenditure_M as expenditure_millions, 
+				ROUND(ge.Expenditure_gdp*100,2) as expenditure_gdp, 
+                ROUND(ge.Expenditure_budget*100,2) as expenditure_budget, 
+                ge.YOY_growth
+from locations as l
+inner join government_expenditure as ge
+	on l.country_name = ge.Countries
+					and Countries != 'United States' 
+					and Countries != 'Germany' 
+					and Countries !='France' 
+                    and Countries != 'Spain' 
+                    and Countries != 'Portugal' 
+                    and Countries != 'Netherlands' 
+                    and Countries != 'United Kingdom' 
+                    and Countries != 'Brazil' 
+                    and Countries != 'Mexico'
+order by ge.Expenditure_M desc, ge.Date desc;
+
+select *
+from country_expenditure_excluded
+where date = '2019'
+order by expenditure_millions desc
+limit 10;
+
+select *
+from country_expenditure_excluded
+where date = '2020'
+order by expenditure_millions desc
+limit 10;
+
+-- Understanding school count share on opportunity countries
+
+CREATE VIEW market_share_schools AS
+select l.country_name as country_name, count(distinct s.school) as schools_count
+from locations as l
+inner join schools as s
+	on l.school_id = s.school_id
+where country_name is not null 
+					and country_name != 'United States' 
+					and country_name != 'Germany' 
+					and country_name !='France' 
+                    and country_name != 'Spain' 
+                    and country_name != 'Portugal' 
+                    and country_name != 'Netherlands' 
+                    and country_name != 'United Kingdom' 
+                    and country_name != 'Brazil' 
+                    and country_name != 'Mexico'
+group by country_name
+order by schools_count desc;
+
+select *
+from market_share_schools
+where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada';
+
+select l.country_name as country_name, s.school as school
+from schools as s
+inner join locations as l	
+	on l.school_id = s.school_id
+where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada'
+group by  country_name, school
+order by country_name desc; 
+
+-- Note: only le-wagon has a franchise model, not a branded model for opening campuses. 
+-- Norway: le-wagon is the only one here
+-- Canada & Belgium: la-capsule & wild-code-schools mainly works on French speaking countries, so competition would be harder if the bootcamp are not taught in French.
