@@ -387,7 +387,7 @@ order by country_name desc;
 -- Web development courses would the best first option because of the highest overall rates
 
 -- adding location tables
-
+	
 CREATE VIEW locations_tables AS 
 select l.country_name as country_name, l.country_abbrev as country_abbrev -- pending metrics to add
 from locations as l
@@ -401,5 +401,11 @@ inner join itc_services as itc
 	on l.country_name = itc.GEO
 inner join jvs_table as jvs
 	on l.country_name = jvs.GEO
+inner join itc_gdp as itc_gdp
+	on l.country_name = itc_gdp.GEO
+
+
+
+
 
 
