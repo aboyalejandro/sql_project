@@ -367,6 +367,21 @@ where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Can
 group by  country_name, school
 order by country_name desc; 
 
+select l.country_name as country_name, s.school as school, c.courses as courses, -- sum(com.tagline) as comments, 
+avg(com.overall) as overall, avg(com.curriculum) as curriculum, avg(com.jobSupport) as job_support
+from schools as s
+inner join locations as l	
+	on l.school_id = s.school_id
+inner join courses as c
+	on l.school_id = c.school_id
+inner join comments as com
+	on l.school = com.school
+where country_name = 'Belgium' or country_name = 'Norway'  -- or country_name = 'Canada'
+group by  country_name, school, courses
+HAVING AVG(com.overallScore) > (SELECT AVG(overallscore) FROM comments) -- AND country_name IS NOT NULL
+order by country_name desc; 
+
 -- Note: only le-wagon has a franchise model, not a branded model for opening campuses. 
 -- Norway: le-wagon is the only one here
 -- Canada & Belgium: la-capsule & wild-code-schools mainly works on French speaking countries, so competition would be harder if the bootcamp are not taught in French.
+-- Web development courses would the best first option because of the highest overall rates
