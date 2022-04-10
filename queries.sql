@@ -226,10 +226,31 @@ limit 10;
 -- Checking out the cities where Ironhack offers courses
 select city_name, school, country_abbrev description, country_name
 from locations
-where school LIKE ‘%ironhack%’ and description != ‘Online’;
+where school LIKE '%ironhack%' and description != 'Online';
+
 -- Top Cities by number of courses offered (total) outside US and excluding Ironhack
 SELECT city_name, count(*)
 FROM locations
 WHERE description != ‘Online’ and country_id != 1 and  school != ‘ironhack’
 GROUP BY city_name
 ORDER BY count(*) DESC;
+
+-- Schools by Country  (On-site/ comments rate over mean)
+-- mean commments rate 4.68 / Not Null = Online
+SELECT l.country_name, l.country_abbrev ,c.school, AVG(c.overallScore) AS score
+FROM comments as c
+JOIN locations as l
+ON c.school = l.school
+GROUP BY country_abbrev,c.school
+HAVING score > (SELECT AVG(overallscore) AS score FROM comments) AND country_name IS NOT NULL
+ORDER BY country_name, score DESC;
+
+-- COUNT Schools by Country  (On-site/ comments rate over mean)
+-- mean commments rate 4.68 / Not Null = Online
+SELECT l.country_name,country_abbrev, COUNT( DISTINCT l.school) AS qty_schools
+FROM comments as c
+JOIN locations as l
+ON c.school = l.school
+GROUP BY l.country_name
+HAVING AVG(c.overallScore) > (SELECT AVG(overallscore) FROM comments) AND country_name IS NOT NULL
+ORDER BY country_name
