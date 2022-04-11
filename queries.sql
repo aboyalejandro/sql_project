@@ -357,13 +357,13 @@ order by schools_count desc;
 
 select *
 from market_share_schools
-where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada';
+where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada' or country_name = 'Sweden';
 
 select l.country_name as country_name, s.school as school
 from schools as s
 inner join locations as l	
 	on l.school_id = s.school_id
-where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada'
+where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Canada'  or country_name = 'Sweden'
 group by  country_name, school
 order by country_name desc; 
 
@@ -376,7 +376,7 @@ inner join courses as c
 	on l.school_id = c.school_id
 inner join comments as com
 	on l.school = com.school
-where country_name = 'Belgium' or country_name = 'Norway'  -- or country_name = 'Canada'
+where country_name = 'Belgium' or country_name = 'Norway' or country_name = 'Sweden'  -- or country_name = 'Canada'
 group by  country_name, school, courses
 HAVING AVG(com.overallScore) > (SELECT AVG(overallscore) FROM comments) -- AND country_name IS NOT NULL
 order by country_name desc; 
